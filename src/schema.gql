@@ -1,0 +1,75 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ReplyType {
+  id: Int
+  content: String!
+  userid: Float!
+  userName: String!
+  commentid: Int!
+}
+
+type CommentType {
+  id: Int!
+  content: String!
+  userid: Int!
+  blogid: Int!
+  userName: String!
+  replies: [ReplyType!]!
+}
+
+type BlogType {
+  id: Int
+  title: String
+  content: String!
+  userid: Float!
+  comments: [CommentType!]!
+  author: String!
+}
+
+type TokenType {
+  id: Int
+  jwt: String
+}
+
+type Query {
+  blogs: [BlogType!]!
+}
+
+type Mutation {
+  newBlog(newBlogDTO: NewBlogDTO!): BlogType!
+  newComment(newCommentDTO: NewCommentDTO!): String!
+  newReply(newReplyDTO: NewReplyDTO!): String!
+  signup(signupDTO: SignupDTO!): String!
+  login(loginDTO: LoginDTO!): TokenType!
+}
+
+input NewBlogDTO {
+  title: String!
+  content: String!
+  userid: String!
+}
+
+input NewCommentDTO {
+  content: String!
+  userid: String!
+  blogid: Int!
+}
+
+input NewReplyDTO {
+  content: String!
+  userid: String!
+  commentid: Int!
+}
+
+input SignupDTO {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginDTO {
+  email: String!
+  password: String!
+}
