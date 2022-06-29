@@ -1,34 +1,34 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql"
 import { BlogsService } from "./blogs.service"
-import { NewBlogDTO } from "./dto/new-blog.dto"
-import { NewCommentDTO } from "./dto/new-comment.dto"
-import { NewReplyDTO } from "./dto/new-reply.dto"
-import { BlogType } from "../../Types/BlogType"
+import { CreateBlogDTO } from "./dto/create-blog.input.dto"
+import { CreateCommentDTO } from "./dto/create-comment.input.dto"
+import { NewReplyDTO } from "./dto/create-reply.input.dto"
+import { Blog } from "./entities/blog.entity"
 
 @Resolver()
 export class BlogsResolver {
   constructor(private readonly blogsService: BlogsService) {}
 
   //ALL-BLOGS QUERY
-  @Query(() => [BlogType], { name: "blogs" })
-  async getBlogs(): Promise<BlogType[]> {
+  @Query(() => [Blog], { name: "getBlogs" })
+  async getBlogs(): Promise<Blog[]> {
     const blogs = await this.blogsService.getBlogs()
     return blogs
   }
 
   //NEW-BLOG MUTATION
-  @Mutation(() => BlogType, { name: "newBlog" })
-  newBlog(@Args("newBlogDTO") newBlogDTO: NewBlogDTO): Promise<BlogType> {
-    const blog = this.blogsService.newBlog(newBlogDTO)
+  @Mutation(() => Blog, { name: "newBlog" })
+  newBlog(@Args("createBlogDTO") createBlogDTO: CreateBlogDTO): Promise<Blog> {
+    const blog = this.blogsService.newBlog(createBlogDTO)
     return blog
   }
 
   //NEW-COMMENT MUTATION
   @Mutation(() => String, { name: "newComment" })
   newComment(
-    @Args("newCommentDTO") newCommentDTO: NewCommentDTO
+    @Args("createCommentDTO") createCommentDTO: CreateCommentDTO
   ): Promise<String> {
-    const comment = this.blogsService.newComment(newCommentDTO)
+    const comment = this.blogsService.newComment(createCommentDTO)
     return comment
   }
 

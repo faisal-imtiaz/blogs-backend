@@ -2,29 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type ReplyType {
-  id: Int
+type Reply {
+  id: Int!
   content: String!
   userid: Float!
-  userName: String!
   commentid: Int!
+  userName: String!
 }
 
-type CommentType {
+type Comment {
   id: Int!
   content: String!
   userid: Int!
   blogid: Int!
   userName: String!
-  replies: [ReplyType!]!
+  replies: [Reply!]!
 }
 
-type BlogType {
-  id: Int
-  title: String
+type Blog {
+  id: Int!
+  title: String!
   content: String!
   userid: Float!
-  comments: [CommentType!]!
+  comments: [Comment!]!
   author: String!
 }
 
@@ -34,24 +34,24 @@ type TokenType {
 }
 
 type Query {
-  blogs: [BlogType!]!
+  getBlogs: [Blog!]!
 }
 
 type Mutation {
-  newBlog(newBlogDTO: NewBlogDTO!): BlogType!
-  newComment(newCommentDTO: NewCommentDTO!): String!
+  newBlog(createBlogDTO: CreateBlogDTO!): Blog!
+  newComment(createCommentDTO: CreateCommentDTO!): String!
   newReply(newReplyDTO: NewReplyDTO!): String!
   signup(signupDTO: SignupDTO!): String!
   login(loginDTO: LoginDTO!): TokenType!
 }
 
-input NewBlogDTO {
+input CreateBlogDTO {
   title: String!
   content: String!
   userid: String!
 }
 
-input NewCommentDTO {
+input CreateCommentDTO {
   content: String!
   userid: String!
   blogid: Int!

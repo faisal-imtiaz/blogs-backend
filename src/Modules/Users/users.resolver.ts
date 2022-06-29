@@ -2,7 +2,7 @@ import { Mutation, Resolver, Args } from "@nestjs/graphql"
 import { TokenType } from "src/Types/Token"
 import { SignupDTO } from "./dto/signup.dto"
 import { UsersService } from "./users.service"
-import { LoginDTO } from "./dto/login.dto"
+import { LoginDTO } from "./dto/login.payload.dto"
 
 @Resolver()
 export class UsersResolver {

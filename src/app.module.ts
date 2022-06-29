@@ -5,10 +5,10 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { GraphQLModule } from "@nestjs/graphql"
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
 import { join } from "path"
-import { User } from "./Modules/Users/entity/user.entity"
-import { Blog } from "./Modules/Blogs/entity/blog.entity"
-import { Comment } from "./Modules/Blogs/entity/comment.entity"
-import { Reply } from "./Modules/Blogs/entity/reply.entity"
+import { User } from "./Modules/Users/entities/user.entity"
+import { Blog } from "./Modules/Blogs/entities/blog.entity"
+import { Comment } from "./Modules/Blogs/entities/comment.entity"
+import { Reply } from "./Modules/Blogs/entities/reply.entity"
 
 @Module({
   imports: [

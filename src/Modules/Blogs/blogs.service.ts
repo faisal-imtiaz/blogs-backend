@@ -1,22 +1,21 @@
 import { Injectable } from "@nestjs/common"
 import { DataSource } from "typeorm"
-import { NewBlogDTO } from "./dto/new-blog.dto"
-import { NewCommentDTO } from "./dto/new-comment.dto"
-import { NewReplyDTO } from "./dto/new-reply.dto"
-import { User } from "../Users/entity/user.entity"
-import { Blog } from "./entity/blog.entity"
-import { Comment } from "./entity/comment.entity"
-import { Reply } from "./entity/reply.entity"
-import { BlogType } from "src/Types/BlogType"
-import { CommentType } from "src/Types/CommentType"
-import { ReplyType } from "src/Types/ReplyType"
-import { UserType } from "src/Types/UserType"
+import { CreateBlogDTO } from "./dto/create-blog.input.dto"
+import { CreateCommentDTO } from "./dto/create-comment.input.dto"
+import { NewReplyDTO } from "./dto/create-reply.input.dto"
+import { User } from "../Users/entities/user.entity"
+import { Blog } from "./entities/blog.entity"
+import { Comment } from "./entities/comment.entity"
+import { Reply } from "./entities/reply.entity"
 
 @Injectable()
 export class BlogsService {
   constructor(private db: DataSource) {}
 
-  async getBlogs(): Promise<BlogType[]> {
+  /**
+   * GET-BLOGS service
+   **/
+  async getBlogs(): Promise<Blog[]> {
     try {
       const userRepository = this.db.getRepository(User)
       const blogRepository = this.db.getRepository(Blog)
@@ -28,17 +27,17 @@ export class BlogsService {
       const comments = await commentRepository.find()
       const replies = await replyRepository.find()
 
-      blogs?.map((blog: BlogType) => {
-        users.forEach((user) => {
+      blogs?.map((blog: Blog) => {
+        users.map((user) => {
           if (user.id === blog.userid) {
             blog.author = user.name
             return
           }
         })
         blog.comments = []
-        comments?.forEach((comment: CommentType) => {
+        comments?.map((comment: Comment) => {
           if (blog.id === comment.blogid) {
-            users?.forEach((user) => {
+            users?.map((user) => {
               if (user.id === comment.userid) {
                 comment.userName = user.name
                 return
@@ -48,9 +47,9 @@ export class BlogsService {
             blog.comments.push(comment)
 
             comment.replies = []
-            replies?.forEach((reply: ReplyType) => {
+            replies?.map((reply: Reply) => {
               if (reply.commentid === comment.id) {
-                users?.forEach((user: UserType) => {
+                users?.map((user: User) => {
                   if (user.id === reply.userid) {
                     reply.userName = user.name
                     return
@@ -69,7 +68,10 @@ export class BlogsService {
     }
   }
 
-  async newBlog(args: NewBlogDTO): Promise<BlogType> {
+  /**
+   * NEW-BLOG service
+   */
+  async newBlog(args: CreateBlogDTO): Promise<Blog> {
     try {
       const blogRepository = this.db.getRepository(Blog)
       const blog = new Blog()
@@ -83,7 +85,10 @@ export class BlogsService {
     }
   }
 
-  async newComment(args: NewCommentDTO): Promise<String> {
+  /**
+   * NEW-COMMENT service
+   */
+  async newComment(args: CreateCommentDTO): Promise<String> {
     try {
       const commentRepository = this.db.getRepository(Comment)
       const comment = new Comment()
@@ -97,6 +102,9 @@ export class BlogsService {
     }
   }
 
+  /**
+   * NEW-REPLY service
+   */
   async newReply(args: NewReplyDTO): Promise<String> {
     try {
       const replyRepository = this.db.getRepository(Reply)

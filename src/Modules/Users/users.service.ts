@@ -3,14 +3,16 @@ import { DataSource } from "typeorm"
 import { Injectable } from "@nestjs/common"
 import { TokenType } from "src/Types/Token"
 import { SignupDTO } from "./dto/signup.dto"
-import { LoginDTO } from "./dto/login.dto"
-import { User } from "./entity/user.entity"
+import { LoginDTO } from "./dto/login.payload.dto"
+import { User } from "./entities/user.entity"
 
 @Injectable()
 export class UsersService {
   constructor(private db: DataSource) {}
 
-  //SIGN-UP
+  /**
+   * SIGNUP service
+   */
   async signup(args: SignupDTO): Promise<String> {
     try {
       const userRepository = this.db.getRepository(User)
@@ -30,7 +32,9 @@ export class UsersService {
     }
   }
 
-  //LOGIN
+  /**
+   * LOGIN service
+   */
   async login(args: LoginDTO): Promise<String | TokenType> {
     try {
       const userRepository = this.db.getRepository(User)

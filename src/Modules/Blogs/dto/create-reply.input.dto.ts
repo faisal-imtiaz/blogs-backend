@@ -1,17 +1,13 @@
 import { Field, InputType, Int } from "@nestjs/graphql"
-import { IsNotEmpty } from "class-validator"
 
 @InputType()
-export class NewCommentDTO {
+export class NewReplyDTO {
   @Field()
-  @IsNotEmpty()
   content: string
 
   @Field()
-  @IsNotEmpty()
   userid: string
 
   @Field(() => Int)
-  @IsNotEmpty()
-  blogid: Number
+  commentid: number
 }
