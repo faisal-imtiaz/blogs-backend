@@ -20,7 +20,8 @@ type Reply {
 type Comment {
   id: String!
   content: String!
-  replies: [Reply!]!
+  commentid: String
+  replies: [Reply!]
 }
 
 type Blog {
@@ -43,10 +44,10 @@ type Query {
 
 type Mutation {
   createBlog(createBlogInputDTO: CreateBlogInputDTO!): Blog!
-  createComment(createCommentInputDTO: CreateCommentInputDTO!): String!
-  createReply(createReplyInputDTO: CreateReplyInputDTO!): String!
+  createComment(createCommentInputDTO: CreateCommentInputDTO!): Comment!
+  createReply(createReplyInputDTO: CreateReplyInputDTO!): Reply!
   signup(createUserInputDTO: CreateUserInputDTO!): User!
-  login(loginDTO: LoginPayloadDTO!): TokenType!
+  login(loginPayloadDTO: LoginPayloadDTO!): TokenType!
 }
 
 input CreateBlogInputDTO {

@@ -21,9 +21,13 @@ export class Comment {
   @Field()
   public content: string
 
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  public commentid: string
+
   // RELATIONS!
 
-  @Field(() => [Reply])
+  @Field(() => [Reply], { nullable: true })
   @OneToMany(() => Reply, (reply) => reply.comment, { eager: true })
   public replies: Reply[]
 

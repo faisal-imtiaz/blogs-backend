@@ -4,6 +4,8 @@ import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
 import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
 import { CreateReplyInputDTO } from "./dto/create-reply.input.dto"
 import { Blog } from "./entities/blog.entity"
+import { Comment } from "./entities/comment.entity"
+import { Reply } from "./entities/reply.entity"
 
 @Resolver()
 export class BlogsResolver {
@@ -26,19 +28,19 @@ export class BlogsResolver {
   }
 
   //CREATE-COMMENT MUTATION
-  @Mutation(() => String, { name: "createComment" })
+  @Mutation(() => Comment, { name: "createComment" })
   createComment(
     @Args("createCommentInputDTO") createCommentInputDTO: CreateCommentInputDTO
-  ): Promise<String> {
+  ): Promise<Comment> {
     const comment = this.blogsService.createComment(createCommentInputDTO)
     return comment
   }
 
   //CREATE-REPLY MUTATION
-  @Mutation(() => String, { name: "createReply" })
+  @Mutation(() => Reply, { name: "createReply" })
   createReply(
     @Args("createReplyInputDTO") createReplyInputDTO: CreateReplyInputDTO
-  ): Promise<String> {
+  ): Promise<Reply> {
     const reply = this.blogsService.createReply(createReplyInputDTO)
     return reply
   }

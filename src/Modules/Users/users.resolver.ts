@@ -21,7 +21,7 @@ export class UsersResolver {
   //GET-USERS MUTATION
   @Mutation(() => TokenType, { name: "login" })
   async login(
-    @Args("loginDTO") loginPayloadDTO: LoginPayloadDTO
+    @Args("loginPayloadDTO") loginPayloadDTO: LoginPayloadDTO
   ): Promise<TokenType> {
     const token = await this.usersService.login(loginPayloadDTO)
     return token

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Body, Injectable, InternalServerErrorException } from "@nestjs/common"
 import { DataSource, QueryBuilder } from "typeorm"
 import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
 import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
@@ -15,20 +15,27 @@ export class BlogsService {
   async getBlogs(): Promise<Blog[]> {
     try {
       const blogRepository = this.db.getRepository(Blog)
-      const blogs = await blogRepository.find({
-        relations: {
-          comments: true,
-          user: true,
-        },
-      })
+
+      const blogs = await blogRepository
+        .createQueryBuilder("blog")
+        .leftJoinAndSelect("blog.user", "user")
+        .leftJoinAndSelect("blog.comments", "comment")
+        .leftJoinAndSelect(
+          "comment.replies",
+          `commentsA.id = commentsB.commentid`
+        )
+        .getMany()
+
       return blogs
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException(error)
     }
   }
 
   //CREATE-BLOG Service
-  async createBlog(createBlogInputDTO: CreateBlogInputDTO): Promise<Blog> {
+  async createBlog(
+    @Body() createBlogInputDTO: CreateBlogInputDTO
+  ): Promise<Blog> {
     try {
       const blogRepository = this.db.getRepository(Blog)
       const blog = new Blog()
@@ -39,14 +46,14 @@ export class BlogsService {
       await blogRepository.save(blog)
       return blog
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException()
     }
   }
 
   //CREATE-COMMENT Service
   async createComment(
-    createCommentInputDTO: CreateCommentInputDTO
-  ): Promise<String> {
+    @Body() createCommentInputDTO: CreateCommentInputDTO
+  ): Promise<Comment> {
     try {
       const commentRepository = this.db.getRepository(Comment)
       const comment = new Comment()
@@ -54,14 +61,16 @@ export class BlogsService {
       comment.user = createCommentInputDTO.user
       comment.blog = createCommentInputDTO.blog
       await commentRepository.save(comment)
-      return "Comment Added!"
+      return comment
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException()
     }
   }
 
   //CREATE-REPLY Service
-  async createReply(createReplyInputDTO: CreateReplyInputDTO): Promise<String> {
+  async createReply(
+    @Body() createReplyInputDTO: CreateReplyInputDTO
+  ): Promise<Reply> {
     try {
       const replyRepository = this.db.getRepository(Reply)
       const reply = new Reply()
@@ -69,9 +78,9 @@ export class BlogsService {
       reply.user = createReplyInputDTO.user
       reply.comment = createReplyInputDTO.comment
       await replyRepository.save(reply)
-      return "Reply Added!"
+      return reply
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException()
     }
   }
 }
