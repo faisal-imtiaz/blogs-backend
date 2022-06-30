@@ -1,13 +1,13 @@
-import { Field, InputType, Int } from "@nestjs/graphql"
+import { Field, InputType } from "@nestjs/graphql"
 
 @InputType()
-export class NewReplyDTO {
+export class CreateReplyInputDTO {
   @Field()
   content: string
 
   @Field()
-  userid: string
+  user: string
 
-  @Field(() => Int)
-  commentid: number
+  @Field()
+  comment: string
 }

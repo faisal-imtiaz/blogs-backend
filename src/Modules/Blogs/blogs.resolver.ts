@@ -1,8 +1,8 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql"
 import { BlogsService } from "./blogs.service"
-import { CreateBlogDTO } from "./dto/create-blog.input.dto"
-import { CreateCommentDTO } from "./dto/create-comment.input.dto"
-import { NewReplyDTO } from "./dto/create-reply.input.dto"
+import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
+import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
+import { CreateReplyInputDTO } from "./dto/create-reply.input.dto"
 import { Blog } from "./entities/blog.entity"
 
 @Resolver()
@@ -16,26 +16,30 @@ export class BlogsResolver {
     return blogs
   }
 
-  //NEW-BLOG MUTATION
-  @Mutation(() => Blog, { name: "newBlog" })
-  newBlog(@Args("createBlogDTO") createBlogDTO: CreateBlogDTO): Promise<Blog> {
-    const blog = this.blogsService.newBlog(createBlogDTO)
+  //CREATE-BLOG MUTATION
+  @Mutation(() => Blog, { name: "createBlog" })
+  createBlog(
+    @Args("createBlogInputDTO") createBlogInputDTO: CreateBlogInputDTO
+  ): Promise<Blog> {
+    const blog = this.blogsService.createBlog(createBlogInputDTO)
     return blog
   }
 
-  //NEW-COMMENT MUTATION
-  @Mutation(() => String, { name: "newComment" })
-  newComment(
-    @Args("createCommentDTO") createCommentDTO: CreateCommentDTO
+  //CREATE-COMMENT MUTATION
+  @Mutation(() => String, { name: "createComment" })
+  createComment(
+    @Args("createCommentInputDTO") createCommentInputDTO: CreateCommentInputDTO
   ): Promise<String> {
-    const comment = this.blogsService.newComment(createCommentDTO)
+    const comment = this.blogsService.createComment(createCommentInputDTO)
     return comment
   }
 
-  //NEW-REPLY MUTATION
-  @Mutation(() => String, { name: "newReply" })
-  newReply(@Args("newReplyDTO") newReplyDTO: NewReplyDTO): Promise<String> {
-    const reply = this.blogsService.newReply(newReplyDTO)
+  //CREATE-REPLY MUTATION
+  @Mutation(() => String, { name: "createReply" })
+  createReply(
+    @Args("createReplyInputDTO") createReplyInputDTO: CreateReplyInputDTO
+  ): Promise<String> {
+    const reply = this.blogsService.createReply(createReplyInputDTO)
     return reply
   }
 }

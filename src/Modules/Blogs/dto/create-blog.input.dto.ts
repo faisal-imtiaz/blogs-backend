@@ -1,6 +1,6 @@
 import { Field, InputType, Int } from "@nestjs/graphql"
 @InputType()
-export class CreateBlogDTO {
+export class CreateBlogInputDTO {
   @Field()
   title: string
 
@@ -8,5 +8,5 @@ export class CreateBlogDTO {
   content: string
 
   @Field()
-  userid: string
+  user: string
 }

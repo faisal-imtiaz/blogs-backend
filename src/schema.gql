@@ -2,34 +2,38 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  id: String!
+  name: String!
+  email: String!
+  password: String!
+  blogs: [Blog!]!
+  comments: [Comment!]!
+  replies: [Reply!]!
+}
+
 type Reply {
-  id: Int!
+  id: String!
   content: String!
-  userid: Float!
-  commentid: Int!
-  userName: String!
 }
 
 type Comment {
-  id: Int!
+  id: String!
   content: String!
-  userid: Int!
-  blogid: Int!
-  userName: String!
   replies: [Reply!]!
 }
 
 type Blog {
-  id: Int!
+  id: String!
   title: String!
   content: String!
-  userid: Float!
-  comments: [Comment!]!
   author: String!
+  comments: [Comment!]!
+  user: User!
 }
 
 type TokenType {
-  id: Int
+  id: String
   jwt: String
 }
 
@@ -38,38 +42,38 @@ type Query {
 }
 
 type Mutation {
-  newBlog(createBlogDTO: CreateBlogDTO!): Blog!
-  newComment(createCommentDTO: CreateCommentDTO!): String!
-  newReply(newReplyDTO: NewReplyDTO!): String!
-  signup(signupDTO: SignupDTO!): String!
-  login(loginDTO: LoginDTO!): TokenType!
+  createBlog(createBlogInputDTO: CreateBlogInputDTO!): Blog!
+  createComment(createCommentInputDTO: CreateCommentInputDTO!): String!
+  createReply(createReplyInputDTO: CreateReplyInputDTO!): String!
+  signup(createUserInputDTO: CreateUserInputDTO!): User!
+  login(loginDTO: LoginPayloadDTO!): TokenType!
 }
 
-input CreateBlogDTO {
+input CreateBlogInputDTO {
   title: String!
   content: String!
-  userid: String!
+  user: String!
 }
 
-input CreateCommentDTO {
+input CreateCommentInputDTO {
   content: String!
-  userid: String!
-  blogid: Int!
+  user: String!
+  blog: String!
 }
 
-input NewReplyDTO {
+input CreateReplyInputDTO {
   content: String!
-  userid: String!
-  commentid: Int!
+  user: String!
+  comment: String!
 }
 
-input SignupDTO {
+input CreateUserInputDTO {
   name: String!
   email: String!
   password: String!
 }
 
-input LoginDTO {
+input LoginPayloadDTO {
   email: String!
   password: String!
 }

@@ -1,25 +1,24 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql"
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Field, ObjectType } from "@nestjs/graphql"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { User } from "src/Modules/Users/entities/user.entity"
+import { Comment } from "./comment.entity"
 
 @ObjectType()
 @Entity({ name: "Replies" })
 export class Reply {
-  @PrimaryGeneratedColumn()
-  @Field(() => Int)
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  @Field()
+  public id: string
 
   @Column()
   @Field()
-  content: string
+  public content: string
 
-  @Column()
-  @Field()
-  userid: number
+  // RELATIONS
 
-  @Column()
-  @Field(() => Int)
-  commentid: number
+  @ManyToOne(() => User, (user) => user.replies)
+  public user: string
 
-  @Field()
-  userName: string
+  @ManyToOne(() => Comment, (comment) => comment.replies)
+  public comment: string
 }

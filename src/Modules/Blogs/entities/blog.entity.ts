@@ -1,14 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column } from "typeorm"
-import { Field, Int, ObjectType } from "@nestjs/graphql"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from "typeorm"
+import { Field, ObjectType } from "@nestjs/graphql"
 import { Comment } from "./comment.entity"
-import { v4 as uuid } from "uuid"
+import { User } from "src/Modules/Users/entities/user.entity"
 
 @ObjectType()
 @Entity({ name: "Blogs" })
 export class Blog {
-  @PrimaryGeneratedColumn()
-  @Field(() => Int)
-  public id: number
+  @PrimaryGeneratedColumn("uuid")
+  @Field()
+  public id: string
 
   @Column()
   @Field()
@@ -18,13 +24,15 @@ export class Blog {
   @Field()
   public content: string
 
-  @Column()
-  @Field()
-  public userid: number
-
-  @Field(() => [Comment])
-  comments?: Comment[]
-
   @Field()
   author: string
+
+  // RELATIONS!
+  @Field(() => [Comment])
+  @OneToMany(() => Comment, (comment) => comment.blog, { eager: true })
+  public comments: Comment[]
+
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.blogs)
+  public user: string
 }
