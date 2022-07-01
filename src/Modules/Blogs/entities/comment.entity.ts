@@ -34,6 +34,7 @@ export class Comment {
   @ManyToOne(() => Blog, (blog) => blog.comments)
   public blog: string
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user) => user.comments, { eager: true })
   public user: string
 }

@@ -15,6 +15,7 @@ type User {
 type Reply {
   id: String!
   content: String!
+  user: User
 }
 
 type Comment {
@@ -22,6 +23,7 @@ type Comment {
   content: String!
   commentid: String
   replies: [Reply!]
+  user: User
 }
 
 type Blog {

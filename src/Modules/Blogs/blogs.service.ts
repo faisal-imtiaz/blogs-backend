@@ -16,15 +16,12 @@ export class BlogsService {
     try {
       const blogRepository = this.db.getRepository(Blog)
 
-      const blogs = await blogRepository
-        .createQueryBuilder("blog")
-        .leftJoinAndSelect("blog.user", "user")
-        .leftJoinAndSelect("blog.comments", "comment")
-        .leftJoinAndSelect(
-          "comment.replies",
-          `commentsA.id = commentsB.commentid`
-        )
-        .getMany()
+      const blogs = blogRepository.find({
+        relations: {
+          comments: true,
+          user: true,
+        },
+      })
 
       return blogs
     } catch (error) {

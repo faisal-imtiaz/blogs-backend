@@ -1,4 +1,6 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql"
+import { UseGuards } from "@nestjs/common"
+import { AuthGuard } from "src/Auth/auth.guard"
 import { BlogsService } from "./blogs.service"
 import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
 import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
@@ -13,6 +15,7 @@ export class BlogsResolver {
 
   //ALL-BLOGS QUERY
   @Query(() => [Blog], { name: "getBlogs" })
+  @UseGuards(AuthGuard)
   async getBlogs(): Promise<Blog[]> {
     const blogs = await this.blogsService.getBlogs()
     return blogs

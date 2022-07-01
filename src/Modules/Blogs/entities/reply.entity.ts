@@ -16,7 +16,8 @@ export class Reply {
 
   // RELATIONS
 
-  @ManyToOne(() => User, (user) => user.replies)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, (user) => user.replies, { eager: true })
   public user: string
 
   @ManyToOne(() => Comment, (comment) => comment.replies)
