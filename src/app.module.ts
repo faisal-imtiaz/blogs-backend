@@ -8,7 +8,6 @@ import { join } from "path"
 import { User } from "./Modules/Users/entities/user.entity"
 import { Blog } from "./Modules/Blogs/entities/blog.entity"
 import { Comment } from "./Modules/Blogs/entities/comment.entity"
-import { Reply } from "./Modules/Blogs/entities/reply.entity"
 
 @Module({
   imports: [
@@ -26,7 +25,7 @@ import { Reply } from "./Modules/Blogs/entities/reply.entity"
       username: "postgres",
       password: "root",
       database: "blogsDB",
-      entities: [User, Blog, Comment, Reply],
+      entities: [User, Blog, Comment],
       synchronize: true,
     }),
   ],

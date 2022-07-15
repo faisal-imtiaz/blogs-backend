@@ -4,10 +4,8 @@ import { AuthGuard } from "src/Auth/auth.guard"
 import { BlogsService } from "./blogs.service"
 import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
 import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
-import { CreateReplyInputDTO } from "./dto/create-reply.input.dto"
 import { Blog } from "./entities/blog.entity"
 import { Comment } from "./entities/comment.entity"
-import { Reply } from "./entities/reply.entity"
 
 @Resolver()
 export class BlogsResolver {
@@ -18,6 +16,22 @@ export class BlogsResolver {
   @UseGuards(AuthGuard)
   async getBlogs(): Promise<Blog[]> {
     const blogs = await this.blogsService.getBlogs()
+    return blogs
+  }
+
+  //MY-BLOGS QUERY
+  @Query(() => [Blog], { name: "getMyBlogs" })
+  @UseGuards(AuthGuard)
+  async getMyBlogs(@Args("id") id: string): Promise<Blog[]> {
+    const blogs = await this.blogsService.getMyBlogs(id)
+    return blogs
+  }
+
+  //GET-REPLIES QUERY
+  @Query(() => [Comment], { name: "getReplies" })
+  @UseGuards(AuthGuard)
+  async getReplies(@Args("id") id: string): Promise<Comment[]> {
+    const blogs = await this.blogsService.getReplies(id)
     return blogs
   }
 
@@ -37,14 +51,5 @@ export class BlogsResolver {
   ): Promise<Comment> {
     const comment = this.blogsService.createComment(createCommentInputDTO)
     return comment
-  }
-
-  //CREATE-REPLY MUTATION
-  @Mutation(() => Reply, { name: "createReply" })
-  createReply(
-    @Args("createReplyInputDTO") createReplyInputDTO: CreateReplyInputDTO
-  ): Promise<Reply> {
-    const reply = this.blogsService.createReply(createReplyInputDTO)
-    return reply
   }
 }

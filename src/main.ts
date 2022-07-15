@@ -7,7 +7,7 @@ db.initialize()
   .catch((error) => console.log(error))
 
 async function bootstrap() {
-  const port = 3600
+  const port = 3300
   const app = await NestFactory.create(AppModule)
   await app.listen(port, () => console.log(`Nest server ready at ${port}`))
 }

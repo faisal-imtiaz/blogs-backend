@@ -1,12 +1,5 @@
 import { Field, ObjectType } from "@nestjs/graphql"
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  OneToMany,
-} from "typeorm"
-import { Reply } from "./reply.entity"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { Blog } from "./blog.entity"
 import { User } from "src/Modules/Users/entities/user.entity"
 
@@ -25,13 +18,13 @@ export class Comment {
   @Field({ nullable: true })
   public commentid: string
 
-  // RELATIONS!
+  @Field({ nullable: true })
+  replyCount?: string
 
-  @Field(() => [Reply], { nullable: true })
-  @OneToMany(() => Reply, (reply) => reply.comment, { eager: true })
-  public replies: Reply[]
+  // RELATIONS
 
-  @ManyToOne(() => Blog, (blog) => blog.comments)
+  @Field({ nullable: true })
+  @ManyToOne(() => Blog, (blog) => blog.comments, { nullable: true })
   public blog: string
 
   @Field(() => User, { nullable: true })

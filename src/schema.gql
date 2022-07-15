@@ -9,20 +9,14 @@ type User {
   password: String!
   blogs: [Blog!]!
   comments: [Comment!]!
-  replies: [Reply!]!
-}
-
-type Reply {
-  id: String!
-  content: String!
-  user: User
 }
 
 type Comment {
   id: String!
   content: String!
   commentid: String
-  replies: [Reply!]
+  replyCount: String
+  blog: String
   user: User
 }
 
@@ -30,9 +24,8 @@ type Blog {
   id: String!
   title: String!
   content: String!
-  author: String!
   comments: [Comment!]!
-  user: User!
+  user: User
 }
 
 type TokenType {
@@ -42,12 +35,13 @@ type TokenType {
 
 type Query {
   getBlogs: [Blog!]!
+  getMyBlogs(id: String!): [Blog!]!
+  getReplies(id: String!): [Comment!]!
 }
 
 type Mutation {
   createBlog(createBlogInputDTO: CreateBlogInputDTO!): Blog!
   createComment(createCommentInputDTO: CreateCommentInputDTO!): Comment!
-  createReply(createReplyInputDTO: CreateReplyInputDTO!): Reply!
   signup(createUserInputDTO: CreateUserInputDTO!): User!
   login(loginPayloadDTO: LoginPayloadDTO!): TokenType!
 }
@@ -61,13 +55,8 @@ input CreateBlogInputDTO {
 input CreateCommentInputDTO {
   content: String!
   user: String!
-  blog: String!
-}
-
-input CreateReplyInputDTO {
-  content: String!
-  user: String!
-  comment: String!
+  blog: String
+  commentid: String
 }
 
 input CreateUserInputDTO {

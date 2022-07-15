@@ -8,6 +8,9 @@ export class CreateCommentInputDTO {
   @Field()
   user: string
 
-  @Field()
-  blog: string
+  @Field({ nullable: true })
+  blog?: string
+
+  @Field({ nullable: true })
+  commentid?: string
 }

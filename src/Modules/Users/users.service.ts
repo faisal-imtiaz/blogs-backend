@@ -37,9 +37,7 @@ export class UsersService {
     }
   }
 
-  /**
-   * LOGIN service
-   */
+  //LOGIN service
   async login(@Body() loginPayloadDTO: LoginPayloadDTO): Promise<TokenType> {
     try {
       const userRepository = this.db.getRepository(User)

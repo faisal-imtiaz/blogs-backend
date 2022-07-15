@@ -24,15 +24,13 @@ export class Blog {
   @Field()
   public content: string
 
-  @Field()
-  author: string
+  // RELATIONS
 
-  // RELATIONS!
   @Field(() => [Comment])
   @OneToMany(() => Comment, (comment) => comment.blog, { eager: true })
   public comments: Comment[]
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.blogs)
   public user: string
 }
