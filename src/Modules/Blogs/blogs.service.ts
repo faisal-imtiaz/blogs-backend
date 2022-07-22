@@ -1,7 +1,11 @@
-import { Body, Injectable, InternalServerErrorException } from "@nestjs/common"
-import { text } from "express"
-import { DataSource } from "typeorm"
-import { User } from "../Users/entities/user.entity"
+import {
+  Body,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Repository } from "typeorm"
 import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
 import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
 import { Blog } from "./entities/blog.entity"
@@ -9,27 +13,32 @@ import { Comment } from "./entities/comment.entity"
 
 @Injectable()
 export class BlogsService {
-  constructor(private db: DataSource) {}
+  constructor(
+    @InjectRepository(Blog)
+    private readonly blogRepository: Repository<Blog>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>
+  ) {}
 
   //GET-BLOGS Service
   async getBlogs(): Promise<Blog[]> {
     try {
-      const blogRepository = this.db.getRepository(Blog)
-      const blogs = await blogRepository.find({
+      const blogs = await this.blogRepository.find({
         relations: {
           comments: true,
           user: true,
         },
       })
 
+      //ADDING REPLY-COUNT IN EACH COMMENT
       const addReplyCount = (comments) =>
-        comments.map(async (comment) => {
-          const replyCount = await this.db.query(
-            `select count(id) from "Comments" where commentId = '${comment.id}'`
-          )
+        comments.map(async (comment: Comment) => {
+          const replyCount = await this.commentRepository.count({
+            where: { commentid: comment.id },
+          })
           return {
             ...comment,
-            replyCount: replyCount[0]?.count,
+            replyCount,
           }
         })
 
@@ -47,8 +56,7 @@ export class BlogsService {
   //MY-BLOGS Service
   async getMyBlogs(id: string): Promise<Blog[]> {
     try {
-      const blogRepository = this.db.getRepository(Blog)
-      const blogs = await blogRepository.find({
+      const blogs = await this.blogRepository.find({
         relations: {
           comments: true,
           user: true,
@@ -66,17 +74,33 @@ export class BlogsService {
         return blog?.user?.id === id
       })
 
+      //ADDING REPLY-COUNT IN EACH COMMENT
+      const addReplyCount = (comments) =>
+        comments.map(async (comment: Comment) => {
+          const replyCount = await this.commentRepository.count({
+            where: { commentid: comment.id },
+          })
+          return {
+            ...comment,
+            replyCount,
+          }
+        })
+
+      userBlogs.map((blog: Blog) => {
+        const updatedComments = addReplyCount(blog.comments)
+        blog.comments = updatedComments
+      })
+
       return userBlogs
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new NotFoundException("User not Authorized")
     }
   }
 
   //GET-REPLIES Service
   async getReplies(id: string): Promise<Comment[]> {
     try {
-      const commentRepository = this.db.getRepository(Comment)
-      const replies = await commentRepository.find({
+      const replies = await this.commentRepository.find({
         where: { commentid: id },
         relations: { user: true },
       })
@@ -91,13 +115,12 @@ export class BlogsService {
     @Body() createBlogInputDTO: CreateBlogInputDTO
   ): Promise<Blog> {
     try {
-      const blogRepository = this.db.getRepository(Blog)
       const blog = new Blog()
       blog.title = createBlogInputDTO.title
       blog.content = createBlogInputDTO.content
       blog.user = createBlogInputDTO.user
 
-      await blogRepository.save(blog)
+      await this.blogRepository.save(blog)
       return blog
     } catch (error) {
       throw new InternalServerErrorException()
@@ -109,14 +132,13 @@ export class BlogsService {
     @Body() createCommentInputDTO: CreateCommentInputDTO
   ): Promise<Comment> {
     try {
-      const commentRepository = this.db.getRepository(Comment)
       const comment = new Comment()
       comment.content = createCommentInputDTO.content
       comment.user = createCommentInputDTO.user
       comment.blog = createCommentInputDTO.blog
       comment.commentid = createCommentInputDTO.commentid
 
-      await commentRepository.save(comment)
+      await this.commentRepository.save(comment)
       return comment
     } catch (error) {
       throw new InternalServerErrorException()

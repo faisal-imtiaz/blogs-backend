@@ -1,5 +1,5 @@
 import { Mutation, Resolver, Args } from "@nestjs/graphql"
-import { TokenType } from "src/Types/Token"
+import { TokenType } from "./types/Token"
 import { CreateUserInputDTO } from "./dto/create-user.input"
 import { UsersService } from "./users.service"
 import { LoginPayloadDTO } from "./dto/login.payload.dto"

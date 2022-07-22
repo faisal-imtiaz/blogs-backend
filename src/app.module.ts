@@ -4,6 +4,7 @@ import { UsersModule } from "./Modules/Users/users.module"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { GraphQLModule } from "@nestjs/graphql"
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
+import { ConfigModule } from "@nestjs/config"
 import { join } from "path"
 import { User } from "./Modules/Users/entities/user.entity"
 import { Blog } from "./Modules/Blogs/entities/blog.entity"
@@ -13,6 +14,10 @@ import { Comment } from "./Modules/Blogs/entities/comment.entity"
   imports: [
     BlogModule,
     UsersModule,
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: true,
