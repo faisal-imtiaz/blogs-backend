@@ -1,26 +1,29 @@
 import { Mutation, Resolver, Args } from "@nestjs/graphql"
-import { TokenType } from "src/Types/Token"
-import { SignupDTO } from "./dto/signup.dto"
+import { TokenType } from "./types/Token"
+import { CreateUserInputDTO } from "./dto/create-user.input"
 import { UsersService } from "./users.service"
-import { LoginDTO } from "./dto/login.dto"
+import { LoginPayloadDTO } from "./dto/login.payload.dto"
+import { User } from "./entities/user.entity"
 
 @Resolver()
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   //SIGNUP MUTATION
-  @Mutation(() => String, { name: "signup" })
-  signup(@Args("signupDTO") signupDTO: SignupDTO): Promise<String> {
-    const user = this.usersService.signup(signupDTO)
+  @Mutation(() => User, { name: "signup" })
+  signup(
+    @Args("createUserInputDTO") createUserInputDTO: CreateUserInputDTO
+  ): Promise<User> {
+    const user = this.usersService.signup(createUserInputDTO)
     return user
   }
 
   //GET-USERS MUTATION
   @Mutation(() => TokenType, { name: "login" })
   async login(
-    @Args("loginDTO") loginDTO: LoginDTO
-  ): Promise<String | TokenType> {
-    const token = await this.usersService.login(loginDTO)
+    @Args("loginPayloadDTO") loginPayloadDTO: LoginPayloadDTO
+  ): Promise<TokenType> {
+    const token = await this.usersService.login(loginPayloadDTO)
     return token
   }
 }

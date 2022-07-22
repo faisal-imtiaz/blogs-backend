@@ -1,113 +1,147 @@
-import { Injectable } from "@nestjs/common"
-import { DataSource } from "typeorm"
-import { NewBlogDTO } from "./dto/new-blog.dto"
-import { NewCommentDTO } from "./dto/new-comment.dto"
-import { NewReplyDTO } from "./dto/new-reply.dto"
-import { User } from "../Users/entity/user.entity"
-import { Blog } from "./entity/blog.entity"
-import { Comment } from "./entity/comment.entity"
-import { Reply } from "./entity/reply.entity"
-import { BlogType } from "src/Types/BlogType"
-import { CommentType } from "src/Types/CommentType"
-import { ReplyType } from "src/Types/ReplyType"
-import { UserType } from "src/Types/UserType"
+import {
+  Body,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Repository } from "typeorm"
+import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
+import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
+import { Blog } from "./entities/blog.entity"
+import { Comment } from "./entities/comment.entity"
 
 @Injectable()
 export class BlogsService {
-  constructor(private db: DataSource) {}
+  constructor(
+    @InjectRepository(Blog)
+    private readonly blogRepository: Repository<Blog>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>
+  ) {}
 
-  async getBlogs(): Promise<BlogType[]> {
+  //GET-BLOGS Service
+  async getBlogs(): Promise<Blog[]> {
     try {
-      const userRepository = this.db.getRepository(User)
-      const blogRepository = this.db.getRepository(Blog)
-      const commentRepository = this.db.getRepository(Comment)
-      const replyRepository = this.db.getRepository(Reply)
+      const blogs = await this.blogRepository.find({
+        relations: {
+          comments: true,
+          user: true,
+        },
+      })
 
-      const users = await userRepository.find()
-      const blogs = await blogRepository.find()
-      const comments = await commentRepository.find()
-      const replies = await replyRepository.find()
-
-      blogs?.map((blog: BlogType) => {
-        users.forEach((user) => {
-          if (user.id === blog.userid) {
-            blog.author = user.name
-            return
+      //ADDING REPLY-COUNT IN EACH COMMENT
+      const addReplyCount = (comments) =>
+        comments.map(async (comment: Comment) => {
+          const replyCount = await this.commentRepository.count({
+            where: { commentid: comment.id },
+          })
+          return {
+            ...comment,
+            replyCount,
           }
         })
-        blog.comments = []
-        comments?.forEach((comment: CommentType) => {
-          if (blog.id === comment.blogid) {
-            users?.forEach((user) => {
-              if (user.id === comment.userid) {
-                comment.userName = user.name
-                return
-              }
-            })
 
-            blog.comments.push(comment)
-
-            comment.replies = []
-            replies?.forEach((reply: ReplyType) => {
-              if (reply.commentid === comment.id) {
-                users?.forEach((user: UserType) => {
-                  if (user.id === reply.userid) {
-                    reply.userName = user.name
-                    return
-                  }
-                })
-                comment.replies.push(reply)
-              }
-            })
-          }
-        })
+      blogs.map((blog: Blog) => {
+        const updatedComments = addReplyCount(blog.comments)
+        blog.comments = updatedComments
       })
 
       return blogs
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException(error)
     }
   }
 
-  async newBlog(args: NewBlogDTO): Promise<BlogType> {
+  //MY-BLOGS Service
+  async getMyBlogs(id: string): Promise<Blog[]> {
     try {
-      const blogRepository = this.db.getRepository(Blog)
+      const blogs = await this.blogRepository.find({
+        relations: {
+          comments: true,
+          user: true,
+        },
+      })
+
+      //RE-FACTORING PENDING
+      // NOT ABLE TO USE UUID IN WHERE CLAUSE
+      // const newBlogs = await this.db.query(
+      //   `select * from "Blogs" where user = '${id}'`
+      // )
+      // console.log("NEW-BLOGS: ", newBlogs)
+
+      const userBlogs = blogs?.filter((blog: any) => {
+        return blog?.user?.id === id
+      })
+
+      //ADDING REPLY-COUNT IN EACH COMMENT
+      const addReplyCount = (comments) =>
+        comments.map(async (comment: Comment) => {
+          const replyCount = await this.commentRepository.count({
+            where: { commentid: comment.id },
+          })
+          return {
+            ...comment,
+            replyCount,
+          }
+        })
+
+      userBlogs.map((blog: Blog) => {
+        const updatedComments = addReplyCount(blog.comments)
+        blog.comments = updatedComments
+      })
+
+      return userBlogs
+    } catch (error) {
+      throw new NotFoundException("User not Authorized")
+    }
+  }
+
+  //GET-REPLIES Service
+  async getReplies(id: string): Promise<Comment[]> {
+    try {
+      const replies = await this.commentRepository.find({
+        where: { commentid: id },
+        relations: { user: true },
+      })
+      return replies
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  //CREATE-BLOG Service
+  async createBlog(
+    @Body() createBlogInputDTO: CreateBlogInputDTO
+  ): Promise<Blog> {
+    try {
       const blog = new Blog()
-      blog.title = args.title
-      blog.content = args.content
-      blog.userid = parseInt(args.userid)
-      await blogRepository.save(blog)
+      blog.title = createBlogInputDTO.title
+      blog.content = createBlogInputDTO.content
+      blog.user = createBlogInputDTO.user
+
+      await this.blogRepository.save(blog)
       return blog
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException()
     }
   }
 
-  async newComment(args: NewCommentDTO): Promise<String> {
+  //CREATE-COMMENT Service
+  async createComment(
+    @Body() createCommentInputDTO: CreateCommentInputDTO
+  ): Promise<Comment> {
     try {
-      const commentRepository = this.db.getRepository(Comment)
       const comment = new Comment()
-      comment.content = args.content
-      comment.userid = parseInt(args.userid)
-      comment.blogid = args.blogid
-      await commentRepository.save(comment)
-      return "Comment Added!"
-    } catch (error) {
-      throw error
-    }
-  }
+      comment.content = createCommentInputDTO.content
+      comment.user = createCommentInputDTO.user
+      comment.blog = createCommentInputDTO.blog
+      comment.commentid = createCommentInputDTO.commentid
 
-  async newReply(args: NewReplyDTO): Promise<String> {
-    try {
-      const replyRepository = this.db.getRepository(Reply)
-      const reply = new Reply()
-      reply.content = args.content
-      reply.userid = parseInt(args.userid)
-      reply.commentid = args.commentid
-      await replyRepository.save(reply)
-      return "Reply Added!"
+      await this.commentRepository.save(comment)
+      return comment
     } catch (error) {
-      throw error
+      throw new InternalServerErrorException()
     }
   }
 }

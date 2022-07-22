@@ -2,74 +2,70 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type ReplyType {
-  id: Int
-  content: String!
-  userid: Float!
-  userName: String!
-  commentid: Int!
+type User {
+  id: String!
+  name: String!
+  email: String!
+  password: String!
+  blogs: [Blog!]!
+  comments: [Comment!]!
 }
 
-type CommentType {
-  id: Int!
+type Comment {
+  id: String!
   content: String!
-  userid: Int!
-  blogid: Int!
-  userName: String!
-  replies: [ReplyType!]!
+  commentid: String
+  replyCount: String
+  blog: String
+  user: User
 }
 
-type BlogType {
-  id: Int
-  title: String
+type Blog {
+  id: String!
+  title: String!
   content: String!
-  userid: Float!
-  comments: [CommentType!]!
-  author: String!
+  comments: [Comment!]!
+  user: User
 }
 
 type TokenType {
-  id: Int
+  id: String
   jwt: String
 }
 
 type Query {
-  blogs: [BlogType!]!
+  getBlogs: [Blog!]!
+  getMyBlogs(id: String!): [Blog!]!
+  getReplies(id: String!): [Comment!]!
 }
 
 type Mutation {
-  newBlog(newBlogDTO: NewBlogDTO!): BlogType!
-  newComment(newCommentDTO: NewCommentDTO!): String!
-  newReply(newReplyDTO: NewReplyDTO!): String!
-  signup(signupDTO: SignupDTO!): String!
-  login(loginDTO: LoginDTO!): TokenType!
+  createBlog(createBlogInputDTO: CreateBlogInputDTO!): Blog!
+  createComment(createCommentInputDTO: CreateCommentInputDTO!): Comment!
+  signup(createUserInputDTO: CreateUserInputDTO!): User!
+  login(loginPayloadDTO: LoginPayloadDTO!): TokenType!
 }
 
-input NewBlogDTO {
+input CreateBlogInputDTO {
   title: String!
   content: String!
-  userid: String!
+  user: String!
 }
 
-input NewCommentDTO {
+input CreateCommentInputDTO {
   content: String!
-  userid: String!
-  blogid: Int!
+  user: String!
+  blog: String
+  commentid: String
 }
 
-input NewReplyDTO {
-  content: String!
-  userid: String!
-  commentid: Int!
-}
-
-input SignupDTO {
+input CreateUserInputDTO {
   name: String!
   email: String!
   password: String!
 }
 
-input LoginDTO {
+input LoginPayloadDTO {
   email: String!
   password: String!
 }

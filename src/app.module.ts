@@ -4,16 +4,20 @@ import { UsersModule } from "./Modules/Users/users.module"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { GraphQLModule } from "@nestjs/graphql"
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
+import { ConfigModule } from "@nestjs/config"
 import { join } from "path"
-import { User } from "./Modules/Users/entity/user.entity"
-import { Blog } from "./Modules/Blogs/entity/blog.entity"
-import { Comment } from "./Modules/Blogs/entity/comment.entity"
-import { Reply } from "./Modules/Blogs/entity/reply.entity"
+import { User } from "./Modules/Users/entities/user.entity"
+import { Blog } from "./Modules/Blogs/entities/blog.entity"
+import { Comment } from "./Modules/Blogs/entities/comment.entity"
 
 @Module({
   imports: [
     BlogModule,
     UsersModule,
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: true,
@@ -26,7 +30,7 @@ import { Reply } from "./Modules/Blogs/entity/reply.entity"
       username: "postgres",
       password: "root",
       database: "blogsDB",
-      entities: [User, Blog, Comment, Reply],
+      entities: [User, Blog, Comment],
       synchronize: true,
     }),
   ],

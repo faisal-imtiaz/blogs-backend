@@ -1,41 +1,55 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql"
+import { UseGuards } from "@nestjs/common"
+import { AuthGuard } from "src/Auth/auth.guard"
 import { BlogsService } from "./blogs.service"
-import { NewBlogDTO } from "./dto/new-blog.dto"
-import { NewCommentDTO } from "./dto/new-comment.dto"
-import { NewReplyDTO } from "./dto/new-reply.dto"
-import { BlogType } from "../../Types/BlogType"
+import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
+import { CreateCommentInputDTO } from "./dto/create-comment.input.dto"
+import { Blog } from "./entities/blog.entity"
+import { Comment } from "./entities/comment.entity"
 
 @Resolver()
 export class BlogsResolver {
   constructor(private readonly blogsService: BlogsService) {}
 
   //ALL-BLOGS QUERY
-  @Query(() => [BlogType], { name: "blogs" })
-  async getBlogs(): Promise<BlogType[]> {
+  @Query(() => [Blog], { name: "getBlogs" })
+  @UseGuards(AuthGuard)
+  async getBlogs(): Promise<Blog[]> {
     const blogs = await this.blogsService.getBlogs()
     return blogs
   }
 
-  //NEW-BLOG MUTATION
-  @Mutation(() => BlogType, { name: "newBlog" })
-  newBlog(@Args("newBlogDTO") newBlogDTO: NewBlogDTO): Promise<BlogType> {
-    const blog = this.blogsService.newBlog(newBlogDTO)
+  //MY-BLOGS QUERY
+  @Query(() => [Blog], { name: "getMyBlogs" })
+  @UseGuards(AuthGuard)
+  async getMyBlogs(@Args("id") id: string): Promise<Blog[]> {
+    const blogs = await this.blogsService.getMyBlogs(id)
+    return blogs
+  }
+
+  //GET-REPLIES QUERY
+  @Query(() => [Comment], { name: "getReplies" })
+  @UseGuards(AuthGuard)
+  async getReplies(@Args("id") id: string): Promise<Comment[]> {
+    const blogs = await this.blogsService.getReplies(id)
+    return blogs
+  }
+
+  //CREATE-BLOG MUTATION
+  @Mutation(() => Blog, { name: "createBlog" })
+  createBlog(
+    @Args("createBlogInputDTO") createBlogInputDTO: CreateBlogInputDTO
+  ): Promise<Blog> {
+    const blog = this.blogsService.createBlog(createBlogInputDTO)
     return blog
   }
 
-  //NEW-COMMENT MUTATION
-  @Mutation(() => String, { name: "newComment" })
-  newComment(
-    @Args("newCommentDTO") newCommentDTO: NewCommentDTO
-  ): Promise<String> {
-    const comment = this.blogsService.newComment(newCommentDTO)
+  //CREATE-COMMENT MUTATION
+  @Mutation(() => Comment, { name: "createComment" })
+  createComment(
+    @Args("createCommentInputDTO") createCommentInputDTO: CreateCommentInputDTO
+  ): Promise<Comment> {
+    const comment = this.blogsService.createComment(createCommentInputDTO)
     return comment
-  }
-
-  //NEW-REPLY MUTATION
-  @Mutation(() => String, { name: "newReply" })
-  newReply(@Args("newReplyDTO") newReplyDTO: NewReplyDTO): Promise<String> {
-    const reply = this.blogsService.newReply(newReplyDTO)
-    return reply
   }
 }

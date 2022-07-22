@@ -1,52 +1,68 @@
 const jwt = require("jsonwebtoken")
-import { DataSource } from "typeorm"
-import { Injectable } from "@nestjs/common"
-import { TokenType } from "src/Types/Token"
-import { SignupDTO } from "./dto/signup.dto"
-import { LoginDTO } from "./dto/login.dto"
-import { User } from "./entity/user.entity"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Repository } from "typeorm"
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Body,
+} from "@nestjs/common"
+import { TokenType } from "./types/Token"
+import { CreateUserInputDTO } from "./dto/create-user.input"
+import { LoginPayloadDTO } from "./dto/login.payload.dto"
+import { User } from "./entities/user.entity"
 
 @Injectable()
 export class UsersService {
-  constructor(private db: DataSource) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
+  ) {}
 
-  //SIGN-UP
-  async signup(args: SignupDTO): Promise<String> {
+  //SIGNUP Service
+  async signup(@Body() createUserInputDTO: CreateUserInputDTO): Promise<User> {
     try {
-      const userRepository = this.db.getRepository(User)
-      const user = await userRepository.findOneBy({ email: args.email })
+      const user = await this.userRepository.findOneBy({
+        email: createUserInputDTO.email,
+      })
       if (user) {
-        return "User Already Exists!"
+        throw new ConflictException()
       } else {
         const user = new User()
-        user.name = args.name
-        user.email = args.email
-        user.password = args.password
-        await userRepository.save(user)
-        return "User Added!"
+        user.name = createUserInputDTO.name
+        user.email = createUserInputDTO.email
+        user.password = createUserInputDTO.password
+        await this.userRepository.save(user)
+        return user
       }
     } catch (error) {
-      throw error
+      throw new ConflictException()
     }
   }
 
-  //LOGIN
-  async login(args: LoginDTO): Promise<String | TokenType> {
+  //LOGIN service
+  async login(@Body() loginPayloadDTO: LoginPayloadDTO): Promise<TokenType> {
     try {
-      const userRepository = this.db.getRepository(User)
-      const user = await userRepository.findOneBy({
-        email: args.email,
-        password: args.password,
+      const user = await this.userRepository.findOneBy({
+        email: loginPayloadDTO.email,
+        password: loginPayloadDTO.password,
       })
       if (user) {
         const payload = {
-          email: args.email,
+          email: loginPayloadDTO.email,
         }
         const signedToken = jwt.sign(payload, "kwanso")
-        const token = { id: user.id, jwt: signedToken }
+        const token = {
+          id: user.id,
+          jwt: signedToken,
+          response: {
+            status: 200,
+            message: "Logged-in",
+          },
+        }
         return token
       } else {
-        return "incorrect Credentials!"
+        throw new NotFoundException("User not found!")
       }
     } catch (error) {
       throw error
