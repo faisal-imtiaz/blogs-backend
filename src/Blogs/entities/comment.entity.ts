@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql"
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { Blog } from "./blog.entity"
-import { User } from "src/Modules/Users/entities/user.entity"
+import { User } from "src/Users/entities/user.entity"
 
 @ObjectType()
 @Entity({ name: "Comments" })

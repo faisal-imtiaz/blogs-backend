@@ -26,7 +26,7 @@ export class UsersService {
         email: createUserInputDTO.email,
       })
       if (user) {
-        throw new ConflictException()
+        throw new ConflictException("User already exist!")
       } else {
         const user = new User()
         user.name = createUserInputDTO.name
@@ -36,7 +36,7 @@ export class UsersService {
         return user
       }
     } catch (error) {
-      throw new ConflictException()
+      throw new NotFoundException("Something went wrong!")
     }
   }
 
@@ -47,25 +47,21 @@ export class UsersService {
         email: loginPayloadDTO.email,
         password: loginPayloadDTO.password,
       })
-      if (user) {
-        const payload = {
-          email: loginPayloadDTO.email,
-        }
-        const signedToken = jwt.sign(payload, "kwanso")
-        const token = {
-          id: user.id,
-          jwt: signedToken,
-          response: {
-            status: 200,
-            message: "Logged-in",
-          },
-        }
-        return token
-      } else {
-        throw new NotFoundException("User not found!")
+      const payload = {
+        email: loginPayloadDTO.email,
       }
+      const signedToken = jwt.sign(payload, "kwanso")
+      const token = {
+        id: user.id,
+        jwt: signedToken,
+        res: {
+          status: 200,
+          message: "Logged-in",
+        },
+      }
+      return token
     } catch (error) {
-      throw error
+      throw new NotFoundException("User not found!")
     }
   }
 }

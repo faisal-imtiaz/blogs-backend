@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 import { Field, ObjectType } from "@nestjs/graphql"
 import { Comment } from "./comment.entity"
-import { User } from "src/Modules/Users/entities/user.entity"
+import { User } from "src/Users/entities/user.entity"
 
 @ObjectType()
 @Entity({ name: "Blogs" })
