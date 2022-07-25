@@ -1,6 +1,10 @@
-type ResponseHeader = {
-  status: number
-  message: string
-}
+import { Field, ObjectType } from "@nestjs/graphql"
 
-export type { ResponseHeader }
+@ObjectType()
+export class Response {
+  @Field()
+  public status: number
+
+  @Field()
+  public msg: string
+}

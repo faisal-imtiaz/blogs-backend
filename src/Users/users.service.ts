@@ -11,6 +11,7 @@ import { TokenType } from "./types/Token"
 import { CreateUserInputDTO } from "./dto/create-user.input"
 import { LoginPayloadDTO } from "./dto/login.payload.dto"
 import { User } from "./entities/user.entity"
+import { USER_ADDED } from "src/utills/constants"
 
 @Injectable()
 export class UsersService {
@@ -33,7 +34,7 @@ export class UsersService {
         user.email = createUserInputDTO.email
         user.password = createUserInputDTO.password
         await this.userRepository.save(user)
-        return user
+        return { ...user, res: { status: 201, msg: USER_ADDED } }
       }
     } catch (error) {
       throw new NotFoundException("Something went wrong!")
@@ -54,10 +55,6 @@ export class UsersService {
       const token = {
         id: user.id,
         jwt: signedToken,
-        res: {
-          status: 200,
-          message: "Logged-in",
-        },
       }
       return token
     } catch (error) {

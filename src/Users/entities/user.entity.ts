@@ -2,7 +2,7 @@ import { Field, ObjectType } from "@nestjs/graphql"
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
 import { Blog } from "src/Blogs/entities/blog.entity"
 import { Comment } from "src/Blogs/entities/comment.entity"
-import { ResponseHeader } from "src/utills/types"
+import { Response } from "src/utills/types"
 
 @ObjectType()
 @Entity({ name: "Users" })
@@ -23,8 +23,8 @@ export class User {
   @Field()
   public password: string
 
-  // @Field(() => ResponseHeader)
-  // res: ResponseHeader
+  @Field()
+  public res: Response
 
   // RELATIONS
 
