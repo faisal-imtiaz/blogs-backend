@@ -4,9 +4,10 @@ import { BlogsResolver } from "./blogs.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Blog } from "./entities/blog.entity"
 import { Comment } from "./entities/comment.entity"
+import { User } from "src/Users/entities/user.entity"
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Blog, Comment])],
+  imports: [TypeOrmModule.forFeature([Blog, Comment, User])],
   providers: [BlogsService, BlogsResolver],
 })
 export class BlogModule {}

@@ -1,9 +1,4 @@
-import {
-  Body,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from "@nestjs/common"
+import { Body, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { CreateBlogInputDTO } from "./dto/create-blog.input.dto"
@@ -49,7 +44,7 @@ export class BlogsService {
 
       return blogs
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new NotFoundException("Something went wrong!")
     }
   }
 
@@ -106,7 +101,7 @@ export class BlogsService {
       })
       return replies
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new NotFoundException("Something went wrong!")
     }
   }
 
@@ -123,7 +118,7 @@ export class BlogsService {
       await this.blogRepository.save(blog)
       return blog
     } catch (error) {
-      throw new InternalServerErrorException()
+      throw new NotFoundException("User not Authorized")
     }
   }
 
@@ -141,7 +136,7 @@ export class BlogsService {
       await this.commentRepository.save(comment)
       return comment
     } catch (error) {
-      throw new InternalServerErrorException()
+      throw new NotFoundException("User not Authorized")
     }
   }
 }

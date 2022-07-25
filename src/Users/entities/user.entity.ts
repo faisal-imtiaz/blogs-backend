@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql"
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
-import { Blog } from "src/Modules/Blogs/entities/blog.entity"
-import { Comment } from "src/Modules/Blogs/entities/comment.entity"
+import { Blog } from "src/Blogs/entities/blog.entity"
+import { Comment } from "src/Blogs/entities/comment.entity"
 import { ResponseHeader } from "src/utills/types"
 
 @ObjectType()
